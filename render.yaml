@@ -2,18 +2,68 @@ services:
   - type: web
     name: mitrabot
     runtime: python
+    plan: free
     buildCommand: cd server && pip install -r requirements.txt && cd ../client && npm ci && npm run build
     startCommand: cd server && gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: FLASK_ENV
-        value: test
+        value: production
       - key: SECRET_KEY
         generateValue: true
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: SECURITY_PASSWORD_SALT
         generateValue: true
-      - key: VITE_API_URL
-        value: ""
+      - key: DB_CONNECTION_STRING
+        sync: false
+      - key: AOAI_ENDPOINT
+        sync: false
+      - key: AOAI_KEY
+        sync: false
+      - key: EMBEDDINGS_DEPLOYMENT_NAME
+        value: embeddings
+      - key: COMPLETIONS_DEPLOYMENT_NAME
+        value: completions
+      - key: RESET_PASSWORD_BASE_URL
+        value: https://mitrabot.onrender.com/reset_password/
+      - key: BASE_URL
+        value: https://mitrabot.onrender.com
+      - key: FRONTEND_ORIGIN
+        value: https://mitrabot.onrender.com
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GOOGLE_CSE_ID
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: BING_SUBSCRIPTION_KEY
+        sync: false
+      - key: BING_SEARCH_URL
+        value: https://api.bing.microsoft.com/v7.0/search
+      - key: SPEECH_AI_KEY
+        sync: false
+      - key: SERVICE_REGION
+        value: eastus
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: MAIL_SERVER
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: AZURE_TEXT_ANALYTICS_KEY
+        sync: false
+      - key: AZURE_TEXT_ANALYTICS_ENDPOINT
+        sync: false
+      - key: AZURE_MAPS_KEY
+        sync: false
+      - key: GPLACES_API_KEY
+        sync: false
