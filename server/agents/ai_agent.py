@@ -28,8 +28,8 @@ from pymongo.database import Database
 # -- Custom Modules --
 from services.azure_mongodb import MongoDBClient
 from services.azure import (
-    get_azure_openai_llm,
-    get_azure_openai_embeddings,
+    get_google_llm,
+    get_google_embeddings,
 )
 from utils.docs import format_docs
 from .tools import toolbox
@@ -43,8 +43,8 @@ class AIAgent:
 
     def __init__(self, system_message: str, tool_names: list[str] = []):
         self.db: Database = (MongoDBClient.get_client())[MongoDBClient.get_db_name()]
-        self.llm = get_azure_openai_llm()
-        self.embedding_model = get_azure_openai_embeddings()
+        self.llm = get_google_llm()
+        self.embedding_model = get_google_embeddings()
 
         self.system_message = SystemMessage(content=system_message)
         self.prompt = ChatPromptTemplate.from_messages(

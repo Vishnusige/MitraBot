@@ -243,18 +243,6 @@ class MentalHealthAIAgent(AIAgent):
             logging.info(f"SESSION ID: {session_id}")
             logging.info(f"USER MESSAGE: {message}")
 
-            # ==========================================
-            # TEMPORARY DEMO RESPONSE
-            # ==========================================
-            # This bypasses all AI/OpenAI/LangChain
-            # issues so your frontend definitely works.
-            # ==========================================
-
-            return f"MitraBot response: I received your message -> {message}"
-
-            # ==========================================
-            # ORIGINAL AGENT CODE BELOW
-            # ==========================================
 
             db_client = MongoDBClient.get_client()
             db_name = MongoDBClient.get_db_name()

@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from services.speech_service import speech_to_text
 from agents.mental_health_agent import MentalHealthAIAgent
-from services.azure import MissingAzureOpenAIConfig
+from services.azure import MissingGoogleAPIKeyConfig
 from services.azure_mongodb import MongoDBClient
 
 # Configure logging
@@ -14,44 +14,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 ai_routes = Blueprint("ai", __name__)
-
-
-def _create_fallback_chat(user_id):
-    db = MongoDBClient.get_client()[MongoDBClient.get_db_name()]
-    user_journey_collection = db["user_journeys"]
-    chat_summary_collection = db["chat_summaries"]
-    chat_id = int(datetime.now().timestamp())
-
-    chat_summary_collection.insert_one(
-        {
-            "user_id": user_id,
-            "chat_id": chat_id,
-            "perceived_mood": "",
-            "summary_text": "",
-            "concerns_progress": []
-        }
-    )
-
-    user_journey_collection.update_one(
-        {"user_id": user_id},
-        {
-            "$setOnInsert": {
-                "user_id": user_id,
-                "patient_goals": [],
-                "therapy_type": [],
-                "last_updated": datetime.now().isoformat(),
-                "therapy_plan": [],
-                "mental_health_concerns": []
-            }
-        },
-        upsert=True
-    )
-
-    return chat_id
-
-
-def _fallback_response(message):
-    return f"MitraBot response: I received your message -> {message}"
 
 
 @ai_routes.post("/ai/mental_health/welcome/<user_id>")
@@ -78,12 +40,9 @@ def get_mental_health_agent_welcome(user_id):
             logger.error(f"No greeting found for user {user_id}")
             return jsonify({"error": "Greeting not found"}), 404
 
-    except MissingAzureOpenAIConfig:
-        chat_id = _create_fallback_chat(user_id)
-        response = {
-            "message": _fallback_response("Hello"),
-            "chat_id": chat_id
-        }
+    except MissingGoogleAPIKeyConfig as e:
+        logger.error("Google API configuration error: %s", e, exc_info=True)
+        return jsonify({"error": "Google API key is not configured."}), 500
 
     return jsonify(response), 200
 
@@ -132,8 +91,9 @@ def run_mental_health_agent(user_id, chat_id):
 
         return jsonify(response), 200
 
-    except MissingAzureOpenAIConfig:
-        return jsonify(_fallback_response(prompt)), 200
+    except MissingGoogleAPIKeyConfig as e:
+        logger.error("Google API configuration error: %s", e, exc_info=True)
+        return jsonify({"error": "Google API key is not configured."}), 500
 
     except json.JSONDecodeError as e:
 

@@ -1,48 +1,69 @@
 import os
 from dotenv import load_dotenv
-from langchain_openai import AzureChatOpenAI, AzureOpenAIEmbeddings
+
+try:
+    from langchain.chat_models import ChatGoogleGenerativeAI
+except ImportError:
+    try:
+        from langchain_community.chat_models import ChatGoogleGenerativeAI
+    except ImportError:
+        try:
+            from langchain_google_community.chat_models import ChatGoogleGenerativeAI
+        except ImportError as exc:
+            raise ImportError(
+                "ChatGoogleGenerativeAI is required for Gemini integration. "
+                "Install langchain-google-community, langchain-community, or a compatible LangChain version."
+            ) from exc
+
+try:
+    from langchain.embeddings import GoogleVertexAIEmbeddings
+except ImportError:
+    try:
+        from langchain_community.embeddings import GoogleVertexAIEmbeddings
+    except ImportError:
+        try:
+            from langchain_google_community.embeddings import GoogleVertexAIEmbeddings
+        except ImportError:
+            try:
+                from langchain_google_community import GoogleVertexAIEmbeddings
+            except ImportError as exc:
+                raise ImportError(
+                    "GoogleVertexAIEmbeddings is required for Gemini embeddings. "
+                    "Install langchain-google-community, langchain-community, or a compatible LangChain version."
+                ) from exc
 
 
-class MissingAzureOpenAIConfig(RuntimeError):
-    """Raised when Azure OpenAI credentials are not configured."""
+class MissingGoogleAPIKeyConfig(RuntimeError):
+    """Raised when Google API credentials are not configured."""
 
-def get_azure_openai_variables():
+def get_google_api_key():
     load_dotenv()
-    AOAI_ENDPOINT = os.environ.get("AOAI_ENDPOINT")
-    AOAI_KEY = os.environ.get("AOAI_KEY")
-    AOAI_API_VERSION = os.environ.get("AOAI_API_VERSION", "2024-05-01-preview")
+    GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
-    if not AOAI_ENDPOINT or not AOAI_KEY:
-        raise MissingAzureOpenAIConfig(
-            "Environment variables AOAI_ENDPOINT or AOAI_KEY are not set."
+    if not GOOGLE_API_KEY:
+        raise MissingGoogleAPIKeyConfig(
+            "Environment variable GOOGLE_API_KEY is not set."
         )
 
-    return AOAI_ENDPOINT, AOAI_KEY, AOAI_API_VERSION
+    return GOOGLE_API_KEY
 
-def get_azure_openai_llm():
-    AOAI_ENDPOINT, AOAI_KEY, AOAI_API_VERSION = get_azure_openai_variables()
+def get_google_llm():
+    api_key = get_google_api_key()
 
-    llm = AzureChatOpenAI(
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
         temperature=0.3,
-        openai_api_version=AOAI_API_VERSION,
-        azure_endpoint=AOAI_ENDPOINT,
-        openai_api_key=AOAI_KEY,
-        azure_deployment=os.environ.get("COMPLETIONS_DEPLOYMENT_NAME", "gpt-4"),
+        api_key=api_key,
     )
 
     return llm
 
-def get_azure_openai_embeddings():
-    AOAI_ENDPOINT, AOAI_KEY, AOAI_API_VERSION = get_azure_openai_variables()
+def get_google_embeddings():
+    api_key = get_google_api_key()
 
-    embedding_model = AzureOpenAIEmbeddings(
-        openai_api_version=AOAI_API_VERSION,
-        azure_endpoint=AOAI_ENDPOINT,
-        openai_api_key=AOAI_KEY,
-        azure_deployment=os.environ.get(
-            "EMBEDDINGS_DEPLOYMENT_NAME",
-            "text-embedding-ada-002"
-        ),
+    embedding_model = GoogleVertexAIEmbeddings(
+        api_key=api_key,
+        model="textembedding-gecko-001",
     )
 
     return embedding_model
