@@ -23,6 +23,8 @@ services:
         sync: false
       - key: AOAI_KEY
         sync: false
+      - key: AOAI_API_VERSION
+        value: 2024-05-01-preview
       - key: EMBEDDINGS_DEPLOYMENT_NAME
         value: embeddings
       - key: COMPLETIONS_DEPLOYMENT_NAME
