@@ -66,7 +66,8 @@ def run_app():
         os.path.join(os.path.dirname(__file__), "..", "client", "dist")
     )
 
-    app = Flask(__name__, static_folder=static_folder, static_url_path="")
+    app = Flask(__name__, static_folder=None)
+    app.static_folder = static_folder
 
     # Load config
     app.config.from_object(Config)
