@@ -1,36 +1,6 @@
 import os
 from dotenv import load_dotenv
-
-try:
-    from langchain.chat_models import ChatGoogleGenerativeAI
-except ImportError:
-    try:
-        from langchain_community.chat_models import ChatGoogleGenerativeAI
-    except ImportError:
-        try:
-            from langchain_google_community.chat_models import ChatGoogleGenerativeAI
-        except ImportError as exc:
-            raise ImportError(
-                "ChatGoogleGenerativeAI is required for Gemini integration. "
-                "Install langchain-google-community, langchain-community, or a compatible LangChain version."
-            ) from exc
-
-try:
-    from langchain.embeddings import GoogleVertexAIEmbeddings
-except ImportError:
-    try:
-        from langchain_community.embeddings import GoogleVertexAIEmbeddings
-    except ImportError:
-        try:
-            from langchain_google_community.embeddings import GoogleVertexAIEmbeddings
-        except ImportError:
-            try:
-                from langchain_google_community import GoogleVertexAIEmbeddings
-            except ImportError as exc:
-                raise ImportError(
-                    "GoogleVertexAIEmbeddings is required for Gemini embeddings. "
-                    "Install langchain-google-community, langchain-community, or a compatible LangChain version."
-                ) from exc
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
 
 class MissingGoogleAPIKeyConfig(RuntimeError):
@@ -61,9 +31,9 @@ def get_google_llm():
 def get_google_embeddings():
     api_key = get_google_api_key()
 
-    embedding_model = GoogleVertexAIEmbeddings(
-        api_key=api_key,
-        model="textembedding-gecko-001",
+    embedding_model = GoogleGenerativeAIEmbeddings(
+        google_api_key=api_key,
+        model="models/embedding-001",
     )
 
     return embedding_model
