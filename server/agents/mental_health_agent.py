@@ -40,18 +40,21 @@ class MentalHealthAIAgent(AIAgent):
 
         self.prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", self.system_message.content),
-                ("system", "{past_summaries}"),
-                ("system", "You can retrieve information about the AI using the 'agent_facts' tool."),
-                ("system", "You can generate suggestions using the 'generate_suggestions' tool."),
-                ("system", "You can search for information using the 'web_search_google' tool."),
-                ("system", "You can search for information using the 'web_search_bing' tool."),
-                ("system", "You can search for information using the 'web_search_youtube' tool."),
-                ("system", "You can search for information using the 'web_search_tavily' tool."),
-                ("system", "You can search for locations using the 'location_search_gplaces' tool."),
-                ("system", "You can retrieve your user profile using the 'user_profile_retrieval' tool."),
-                ("system", "You can retrieve your user journey using the 'user_journey_retrieval' tool."),
-                ("system", "user_id:{user_id}"),
+                (
+                    "system",
+                    self.system_message.content
+                    + "\n\n{past_summaries}"
+                    + "\n\nYou can retrieve information about the AI using the 'agent_facts' tool."
+                    + "\nYou can generate suggestions using the 'generate_suggestions' tool."
+                    + "\nYou can search for information using the 'web_search_google' tool."
+                    + "\nYou can search for information using the 'web_search_bing' tool."
+                    + "\nYou can search for information using the 'web_search_youtube' tool."
+                    + "\nYou can search for information using the 'web_search_tavily' tool."
+                    + "\nYou can search for locations using the 'location_search_gplaces' tool."
+                    + "\nYou can retrieve your user profile using the 'user_profile_retrieval' tool."
+                    + "\nYou can retrieve your user journey using the 'user_journey_retrieval' tool."
+                    + "\nuser_id:{user_id}",
+                ),
                 MessagesPlaceholder(variable_name="chat_turns"),
                 ("human", "{input}"),
                 MessagesPlaceholder(variable_name="agent_scratchpad"),
